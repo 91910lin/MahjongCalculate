@@ -1,0 +1,50 @@
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.app-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.app-header h1 {
+  margin-bottom: 1rem;
+  color: #646cff;
+}
+
+.app-header nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.app-header nav a {
+  color: inherit;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s;
+  font-weight: 500;
+  border: 2px solid transparent;
+}
+
+.app-header nav a:hover {
+  background-color: rgba(100, 108, 255, 0.1);
+  border-color: rgba(100, 108, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.app-main {
+  min-height: 60vh;
+}
+
+.app-footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ccc;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}

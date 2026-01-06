@@ -1,0 +1,138 @@
+.score-display {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.not-winning {
+  padding: 2rem;
+  background-color: #ffebee;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.not-winning h3 {
+  color: #f44336;
+  margin-bottom: 0.5rem;
+}
+
+.total-score {
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.total-score h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.score-value {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.points {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.fans-list {
+  background-color: rgba(100, 108, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.fans-list h4 {
+  margin-bottom: 1rem;
+  color: #646cff;
+}
+
+.fans-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fans-table th {
+  background-color: rgba(100, 108, 255, 0.1);
+  padding: 0.8rem;
+  text-align: left;
+  font-weight: bold;
+  border-bottom: 2px solid #646cff;
+}
+
+.fans-table td {
+  padding: 0.8rem;
+  border-bottom: 1px solid rgba(100, 108, 255, 0.1);
+}
+
+.fan-name {
+  font-weight: 500;
+}
+
+.fan-value {
+  text-align: right;
+  font-weight: bold;
+  color: #646cff;
+}
+
+.decomposition {
+  background-color: rgba(76, 175, 80, 0.05);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.decomposition h4 {
+  margin-bottom: 1rem;
+  color: #4caf50;
+}
+
+.decomposition-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.decomposition-item {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+}
+
+.decomposition-item .label {
+  min-width: 120px;
+  font-weight: bold;
+  color: #666;
+}
+
+.decomposition-item .tiles {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.decomposition-item .tile {
+  padding: 0.3rem 0.6rem;
+  background-color: white;
+  color: #333;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .decomposition-item {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .decomposition-item .label {
+    color: #aaa;
+  }
+}

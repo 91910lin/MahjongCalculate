@@ -1,0 +1,113 @@
+.mahjong-tile {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #f0f0f0, #ffffff);
+  border: 2px solid #d0d0d0;
+  border-radius: 6px;
+  box-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.15),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.1),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.8);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+  user-select: none;
+}
+
+.mahjong-tile:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    3px 3px 6px rgba(0, 0, 0, 0.2),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.1),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* 尺寸變體 */
+.mahjong-tile.small {
+  padding: 4px 6px;
+  min-width: 32px;
+  min-height: 44px;
+}
+
+.mahjong-tile.small .tile-unicode {
+  font-size: 24px;
+}
+
+.mahjong-tile.small .tile-name {
+  font-size: 9px;
+}
+
+.mahjong-tile.medium {
+  padding: 6px 8px;
+  min-width: 40px;
+  min-height: 56px;
+}
+
+.mahjong-tile.medium .tile-unicode {
+  font-size: 32px;
+}
+
+.mahjong-tile.medium .tile-name {
+  font-size: 10px;
+}
+
+.mahjong-tile.large {
+  padding: 8px 12px;
+  min-width: 52px;
+  min-height: 72px;
+}
+
+.mahjong-tile.large .tile-unicode {
+  font-size: 42px;
+}
+
+.mahjong-tile.large .tile-name {
+  font-size: 11px;
+}
+
+/* Unicode 符號 */
+.tile-unicode {
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+/* 文字名稱 */
+.tile-name {
+  margin-top: 2px;
+  color: #666;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 旋轉效果（副露牌橫放） */
+.mahjong-tile.rotate {
+  transform: rotate(90deg);
+}
+
+.mahjong-tile.rotate:hover {
+  transform: rotate(90deg) translateY(-2px);
+}
+
+/* 深色模式支援 */
+@media (prefers-color-scheme: dark) {
+  .mahjong-tile {
+    background: linear-gradient(145deg, #2a2a2a, #353535);
+    border-color: #505050;
+    box-shadow:
+      2px 2px 4px rgba(0, 0, 0, 0.4),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.3),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.1);
+  }
+
+  .mahjong-tile:hover {
+    box-shadow:
+      3px 3px 6px rgba(0, 0, 0, 0.5),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.3),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.1);
+  }
+
+  .tile-name {
+    color: #aaa;
+  }
+}

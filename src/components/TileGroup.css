@@ -1,0 +1,62 @@
+.tile-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tile-group-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.tile-group-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  align-items: center;
+}
+
+.tile-group-container.rotate {
+  align-items: flex-start;
+}
+
+.tile-with-count {
+  position: relative;
+  display: inline-block;
+}
+
+.tile-count {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background-color: #ff4444;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 深色模式支援 */
+@media (prefers-color-scheme: dark) {
+  .tile-group-label {
+    color: #bbb;
+  }
+
+  .tile-group-container {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .tile-count {
+    background-color: #cc3333;
+  }
+}
