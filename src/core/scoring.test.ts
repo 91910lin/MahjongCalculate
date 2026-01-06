@@ -97,7 +97,7 @@ describe('scoring', () => {
       expect(result.fans.some(f => f.name === '清一色')).toBe(true)
     })
 
-    it('應該計算花牌', () => {
+    it('應該計算花牌（本花）', () => {
       // 111萬 222萬 333萬 444萬 555萬 6萬 + 6萬（16張）
       const counts = new Array(34).fill(0)
       counts[0] = 3
@@ -112,18 +112,18 @@ describe('scoring', () => {
         isDealer: false,
         dealerStreak: 0,
         roundWind: Wind.EAST,
-        seatWind: Wind.EAST,
+        seatWind: Wind.EAST, // 東家
         isHaidi: false,
         isGangShangKaiHua: false,
         isQiangGangHu: false,
         isTianHu: false,
         isDiHu: false,
-        flowers: [0, 1, 2] // 春夏秋
+        flowers: [0, 4] // 春（對應東）、梅（對應東）
       }
 
       const result = calculateScore(counts, [], 5, scenario)
       expect(result.isWinning).toBe(true)
-      expect(result.fans.some(f => f.name === '花牌' && f.fan === 3)).toBe(true)
+      expect(result.fans.some(f => f.name === '本花' && f.fan === 2)).toBe(true)
     })
 
     it('應該計算三暗刻', () => {
