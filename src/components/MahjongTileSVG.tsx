@@ -9,10 +9,11 @@ interface MahjongTileSVGProps {
 
 export function MahjongTileSVG({ tile, width = 60, height = 80 }: MahjongTileSVGProps) {
   const tileName = getTileName(tile)
+  const baseUrl = import.meta.env.BASE_URL
 
   return (
     <img
-      src={`/tiles/${tile}.svg`}
+      src={`${baseUrl}tiles/${tile}.svg`}
       alt={tileName}
       title={tileName}
       width={width}
