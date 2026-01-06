@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { checkWinning, isThirteenOrphans, countConcealedTriplets, isMenQing } from './winningDetector'
-import { Meld } from '../types/mahjong'
+import { Meld, WinningDecomposition } from '../types/mahjong'
 
 describe('winningDetector', () => {
   describe('checkWinning', () => {
@@ -121,7 +121,7 @@ describe('winningDetector', () => {
 
   describe('countConcealedTriplets', () => {
     it('應該正確計算暗刻數量', () => {
-      const decomposition = {
+      const decomposition: WinningDecomposition = {
         pair: [0, 0],
         melds: [
           { type: 'KE' as const, tiles: [1, 1, 1], isOpen: false },

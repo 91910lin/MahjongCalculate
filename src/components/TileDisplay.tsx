@@ -1,5 +1,5 @@
 import { Question } from '../types/mahjong'
-import { getTileName, getFlowerName, countsToTiles } from '../utils/tileUtils'
+import { getFlowerName, countsToTiles } from '../utils/tileUtils'
 import { MahjongTileSVG } from './MahjongTileSVG'
 import './TileDisplay.css'
 

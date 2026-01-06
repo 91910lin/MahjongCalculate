@@ -11,7 +11,6 @@ import {
   isHonor,
   isWind,
   isDragon,
-  isTerminal,
   getSuit,
   countsToTiles,
   getTotalCount
@@ -166,9 +165,6 @@ function checkSpecialPatterns(
   }
 
   // 七對子
-  const pairCount = decomposition.melds.filter(m =>
-    m.type === 'KE' && m.tiles[0] === m.tiles[1] && m.tiles[1] === m.tiles[2]
-  ).length;
   if (openMelds.length === 0 && getTotalCount(concealedCounts) + 1 === 14) {
     // 檢查是否為7對
     const counts = [...concealedCounts];
@@ -280,7 +276,7 @@ function checkFlowers(fans: FanResult[], scenario: Scenario): void {
 function checkSituationalFans(
   fans: FanResult[],
   scenario: Scenario,
-  openMelds: Meld[]
+  _openMelds: Meld[]
 ): void {
   // 自摸
   if (scenario.isSelfDraw && !fans.some(f => f.name === '門清自摸')) {

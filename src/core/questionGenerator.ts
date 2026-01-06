@@ -1,5 +1,5 @@
 import { Tile, Meld, Question, Scenario, Wind, MeldInHand } from '../types/mahjong';
-import { tilesToCounts, cloneCounts, countsToTiles, getTotalCount } from '../utils/tileUtils';
+import { tilesToCounts } from '../utils/tileUtils';
 import { checkWinning } from './winningDetector';
 
 /**
