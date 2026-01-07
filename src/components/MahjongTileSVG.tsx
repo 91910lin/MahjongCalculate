@@ -12,16 +12,19 @@ export function MahjongTileSVG({ tile, width = 60, height = 80 }: MahjongTileSVG
   const baseUrl = import.meta.env.BASE_URL
 
   return (
-    <img
-      src={`${baseUrl}tiles/${tile}.svg`}
-      alt={tileName}
-      title={tileName}
-      width={width}
-      height={height}
-      style={{
-        filter: 'drop-shadow(2px 2px 3px rgba(0,0,0,0.3))',
-        cursor: 'default'
-      }}
-    />
+    <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', margin: '2px' }}>
+      <img
+        src={`${baseUrl}tiles/${tile}.svg`}
+        alt={tileName}
+        title={`${tileName} (${tile})`}
+        width={width}
+        height={height}
+        style={{
+          filter: 'drop-shadow(2px 2px 3px rgba(0,0,0,0.3))',
+          cursor: 'default'
+        }}
+      />
+      <span style={{ fontSize: '10px', color: '#888', marginTop: '2px' }}>{tile}</span>
+    </div>
   )
 }

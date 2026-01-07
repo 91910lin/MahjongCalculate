@@ -62,6 +62,25 @@ function TileDisplay({ question }: TileDisplayProps) {
         </div>
       </div>
 
+      {/* Debug 資訊 */}
+      <div className="section" style={{ background: '#333', padding: '10px', borderRadius: '5px', marginBottom: '10px' }}>
+        <h3 style={{ color: '#ff0' }}>🔧 Debug Info</h3>
+        <pre style={{ color: '#0f0', fontSize: '12px', whiteSpace: 'pre-wrap' }}>
+{`暗牌編號: [${concealedTiles.join(', ')}]
+胡張編號: ${question.winningTile}
+副露(開門): ${question.openMelds.length === 0 ? '無' : JSON.stringify(question.openMelds.map(m => ({ kind: m.kind, tiles: m.tiles })))}
+--- 場況 ---
+自摸: ${question.scenario.isSelfDraw}
+莊家: ${question.scenario.isDealer} (連莊: ${question.scenario.dealerStreak})
+圈風: ${question.scenario.roundWind} (27=東 28=南 29=西 30=北)
+門風: ${question.scenario.seatWind}
+花牌: [${question.scenario.flowers.join(', ')}] (0春 1夏 2秋 3冬 4梅 5蘭 6菊 7竹)
+海底: ${question.scenario.isHaidi}
+槓上開花: ${question.scenario.isGangShangKaiHua}
+搶槓胡: ${question.scenario.isQiangGangHu}`}
+        </pre>
+      </div>
+
       <div className="section scenario">
         <h3>場況資訊</h3>
         <div className="scenario-grid">
