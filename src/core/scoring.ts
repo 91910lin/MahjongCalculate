@@ -48,6 +48,9 @@ export function calculateScore(
   // 基本台型
   checkBasicPatterns(fans, decomposition, openMelds, scenario);
 
+  // 獨聽判定
+  addDuTingIfApplicable(fans, concealedCounts, openMelds);
+
   // 花牌
   checkFlowers(fans, scenario);
 
