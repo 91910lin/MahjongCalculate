@@ -343,9 +343,10 @@ function checkSituationalFans(
     fans.push({ name: '莊家', fan: 1 });
   }
 
-  // 連莊/拉莊（每連莊1台）
+  // 連莊/拉莊：連N莊 = 連莊N台 + 拉莊N台 = 2N台
   if (scenario.isDealer && scenario.dealerStreak > 0) {
-    fans.push({ name: `連莊`, fan: scenario.dealerStreak });
+    fans.push({ name: '連莊', fan: scenario.dealerStreak });
+    fans.push({ name: '拉莊', fan: scenario.dealerStreak });
   }
 
   // 海底撈月：摸牌牆最後一張牌自摸（1台）
