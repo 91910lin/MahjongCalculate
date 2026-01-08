@@ -36,7 +36,10 @@ describe('scoring', () => {
 
       const result = calculateScore(counts, [], 26, scenario)
       expect(result.isWinning).toBe(true)
-      expect(result.fans.some(f => f.name === '門清自摸')).toBe(true)
+      // 依據中華民國麻將競技協會規則，門清、不求、自摸分開計算
+      expect(result.fans.some(f => f.name === '門清')).toBe(true)
+      expect(result.fans.some(f => f.name === '不求')).toBe(true)
+      expect(result.fans.some(f => f.name === '自摸')).toBe(true)
     })
 
     it('應該計算碰碰胡', () => {
@@ -123,7 +126,8 @@ describe('scoring', () => {
 
       const result = calculateScore(counts, [], 5, scenario)
       expect(result.isWinning).toBe(true)
-      expect(result.fans.some(f => f.name === '本花' && f.fan === 2)).toBe(true)
+      // 依據中華民國麻將競技協會規則，花牌台數
+      expect(result.fans.some(f => f.name === '花牌' && f.fan === 2)).toBe(true)
     })
 
     it('應該計算三暗刻', () => {
