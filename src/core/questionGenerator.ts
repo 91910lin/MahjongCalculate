@@ -219,10 +219,45 @@ function splitIntoOpenAndConcealed(
 
 /**
  * 生成隨機場景
+ * 注意各種特殊情況的互斥關係：
+ * - 搶槓：必須是放槍（非自摸）
+ * - 槓上開花：必須是自摸
+ * - 海底撈月：必須是自摸
+ * - 河底撈魚：必須是放槍（非自摸）
+ * - 這些特殊情況互斥，不能同時發生
  */
 function generateScenario(): Scenario {
-  const isSelfDraw = Math.random() < 0.5;
   const isDealer = Math.random() < 0.25;
+
+  // 先決定是否有特殊情況（5%機率）
+  const specialRoll = Math.random();
+  let isSelfDraw = Math.random() < 0.5;
+  let isHaidi = false;
+  let isGangShangKaiHua = false;
+  let isQiangGangHu = false;
+
+  if (specialRoll < 0.05) {
+    // 5% 機率出現特殊情況，隨機選一種
+    const specialType = Math.floor(Math.random() * 4);
+    switch (specialType) {
+      case 0: // 海底撈月（自摸）
+        isSelfDraw = true;
+        isHaidi = true;
+        break;
+      case 1: // 河底撈魚（放槍）
+        isSelfDraw = false;
+        isHaidi = true;
+        break;
+      case 2: // 槓上開花（自摸）
+        isSelfDraw = true;
+        isGangShangKaiHua = true;
+        break;
+      case 3: // 搶槓（放槍）
+        isSelfDraw = false;
+        isQiangGangHu = true;
+        break;
+    }
+  }
 
   return {
     isSelfDraw,
@@ -230,9 +265,9 @@ function generateScenario(): Scenario {
     dealerStreak: isDealer && Math.random() < 0.3 ? Math.floor(Math.random() * 3) + 1 : 0,
     roundWind: Wind.EAST,
     seatWind: [Wind.EAST, Wind.SOUTH, Wind.WEST, Wind.NORTH][Math.floor(Math.random() * 4)],
-    isHaidi: Math.random() < 0.05,
-    isGangShangKaiHua: Math.random() < 0.05,
-    isQiangGangHu: Math.random() < 0.05,
+    isHaidi,
+    isGangShangKaiHua,
+    isQiangGangHu,
     isTianHu: false,
     isDiHu: false,
     flowers: generateFlowers()
