@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Question, ScoreResult } from '../types/mahjong'
 import { generateQuestion, Difficulty } from '../core/questionGenerator'
 import { calculateScore } from '../core/scoring'
-import { addDuTingIfApplicable } from '../core/scoring'
 import TileDisplay from './TileDisplay'
 import ScoreDisplay from './ScoreDisplay'
 import AnswerInput from './AnswerInput'
@@ -36,18 +35,13 @@ function PracticeMode() {
   const handleSubmit = () => {
     if (!question || userAnswer === null) return
 
-    // 計算正確答案
+    // 計算正確答案（已內建獨聽判定）
     const result = calculateScore(
       question.concealedCounts,
       question.openMelds,
       question.winningTile,
       question.scenario
     )
-
-    // 添加獨聽判定
-    addDuTingIfApplicable(result.fans, question.concealedCounts, question.openMelds)
-    result.totalFan = result.fans.reduce((sum, f) => sum + f.fan, 0)
-    result.totalPoints = result.totalFan * result.basePoints
 
     setScoreResult(result)
     setShowAnswer(true)
