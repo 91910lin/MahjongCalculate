@@ -15,7 +15,7 @@ import {
   countsToTiles,
   getTotalCount
 } from '../utils/tileUtils';
-import { checkWinning, isThirteenOrphans, countConcealedTriplets, isMenQing } from './winningDetector';
+import { checkWinning, isThirteenOrphans, isMenQing } from './winningDetector';
 
 /**
  * 計算胡牌總分
@@ -147,8 +147,10 @@ function checkSpecialPatterns(
     fans.push({ name: '清一色', fan: 8 });
   }
 
+  // 計算暗刻數（放槍時，胡張組成的刻子不算暗刻）
+  const concealedKe = countActualConcealedTriplets(decomposition, winningTile, scenario.isSelfDraw);
+
   // 五暗刻
-  const concealedKe = countConcealedTriplets(decomposition);
   if (concealedKe === 5) {
     fans.push({ name: '五暗刻', fan: 8 });
   }
@@ -408,4 +410,31 @@ export function addDuTingIfApplicable(
   if (tingSet.size === 1) {
     fans.push({ name: '獨聽', fan: 1 });
   }
+}
+
+/**
+ * 計算實際暗刻數量
+ * 放槍時，胡張組成的刻子不算暗刻
+ */
+function countActualConcealedTriplets(
+  decomposition: WinningDecomposition,
+  winningTile: Tile,
+  isSelfDraw: boolean
+): number {
+  let count = 0;
+  let winningTileKeCounted = false;
+
+  for (const meld of decomposition.melds) {
+    if ((meld.type === 'KE' || meld.type === 'GANG') && !meld.isOpen) {
+      // 如果是放槍，且這個刻子包含胡張，則不算暗刻（只扣一次）
+      if (!isSelfDraw && !winningTileKeCounted && meld.tiles[0] === winningTile) {
+        winningTileKeCounted = true;
+        // 這個刻子不算暗刻
+      } else {
+        count++;
+      }
+    }
+  }
+
+  return count;
 }
