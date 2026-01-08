@@ -395,6 +395,9 @@ export function addDuTingIfApplicable(
   concealedCounts: number[],
   openMelds: Meld[]
 ): void {
+  // 避免重複計算
+  if (fans.some(f => f.name === '獨聽')) return;
+
   const tingSet = calculateTingSet(concealedCounts, openMelds);
   if (tingSet.size === 1) {
     fans.push({ name: '獨聽', fan: 1 });
