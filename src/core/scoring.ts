@@ -86,7 +86,12 @@ function checkSpecialPatterns(
   winningTile: Tile,
   scenario: Scenario
 ): void {
-  const allTiles = [...countsToTiles(concealedCounts), winningTile];
+  // 收集所有牌（暗牌 + 副露 + 胡張）
+  const allTiles = [
+    ...countsToTiles(concealedCounts),
+    winningTile,
+    ...openMelds.flatMap(m => m.tiles)
+  ];
 
   // === 十六台 ===
 
