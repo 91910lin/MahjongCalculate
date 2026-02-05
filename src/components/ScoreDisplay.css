@@ -127,6 +127,46 @@
   font-size: 0.9rem;
 }
 
+@media (max-width: 768px) {
+  .total-score {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .total-score h3 {
+    font-size: 1rem;
+  }
+
+  .score-value {
+    font-size: 2rem;
+  }
+
+  .fans-list {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .fans-table th,
+  .fans-table td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .decomposition {
+    padding: 1rem;
+  }
+
+  .decomposition-item {
+    padding: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .decomposition-item .label {
+    min-width: 80px;
+    font-size: 0.85rem;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   .decomposition-item {
     background-color: rgba(255, 255, 255, 0.05);

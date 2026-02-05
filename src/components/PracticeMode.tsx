@@ -1,14 +1,33 @@
 import { useState, useEffect } from 'react'
 import { Question, ScoreResult } from '../types/mahjong'
+import { RulesConfig, DEFAULT_RULES_CONFIG } from '../types/rulesConfig'
 import { generateQuestion, Difficulty } from '../core/questionGenerator'
 import { calculateScore } from '../core/scoring'
 import TileDisplay from './TileDisplay'
 import ScoreDisplay from './ScoreDisplay'
 import AnswerInput from './AnswerInput'
+import RulesConfigPanel from './RulesConfigPanel'
 import './PracticeMode.css'
+
+const STORAGE_KEY = 'mahjong-rules-config'
+
+function loadRulesConfig(): RulesConfig {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      // 合併預設值，確保新增的欄位有預設值
+      return { ...DEFAULT_RULES_CONFIG, ...parsed }
+    }
+  } catch {
+    // ignore parse errors
+  }
+  return { ...DEFAULT_RULES_CONFIG }
+}
 
 function PracticeMode() {
   const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.EASY)
+  const [rulesConfig, setRulesConfig] = useState<RulesConfig>(loadRulesConfig)
   const [question, setQuestion] = useState<Question | null>(null)
   const [userAnswer, setUserAnswer] = useState<number | null>(null)
   const [showAnswer, setShowAnswer] = useState(false)
@@ -24,6 +43,11 @@ function PracticeMode() {
     generateNewQuestion()
   }, [])
 
+  // 持久化規則設定
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(rulesConfig))
+  }, [rulesConfig])
+
   const generateNewQuestion = () => {
     const newQuestion = generateQuestion(difficulty)
     setQuestion(newQuestion)
@@ -32,15 +56,26 @@ function PracticeMode() {
     setScoreResult(null)
   }
 
+  const handleRulesChange = (newConfig: RulesConfig) => {
+    setRulesConfig(newConfig)
+    // 切換規則時自動出新題
+    setUserAnswer(null)
+    setShowAnswer(false)
+    setScoreResult(null)
+    const newQuestion = generateQuestion(difficulty)
+    setQuestion(newQuestion)
+  }
+
   const handleSubmit = () => {
     if (!question || userAnswer === null) return
 
-    // 計算正確答案（已內建獨聽判定）
+    // 計算正確答案
     const result = calculateScore(
       question.concealedCounts,
       question.openMelds,
       question.winningTile,
-      question.scenario
+      question.scenario,
+      rulesConfig
     )
 
     setScoreResult(result)
@@ -90,6 +125,8 @@ function PracticeMode() {
           </span>
         </div>
       </div>
+
+      <RulesConfigPanel config={rulesConfig} onChange={handleRulesChange} />
 
       {question && (
         <div className="question-container">

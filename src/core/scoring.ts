@@ -7,6 +7,7 @@ import {
   ScoreResult,
   Wind
 } from '../types/mahjong';
+import { RulesConfig, DEFAULT_RULES_CONFIG } from '../types/rulesConfig';
 import {
   isHonor,
   isWind,
@@ -24,7 +25,8 @@ export function calculateScore(
   concealedCounts: number[],
   openMelds: Meld[],
   winningTile: Tile,
-  scenario: Scenario
+  scenario: Scenario,
+  rulesConfig: RulesConfig = DEFAULT_RULES_CONFIG
 ): ScoreResult {
   // 1. 檢查是否胡牌
   const decomposition = checkWinning(concealedCounts, openMelds, winningTile);
@@ -43,19 +45,21 @@ export function calculateScore(
   const fans: FanResult[] = [];
 
   // 特殊牌型
-  checkSpecialPatterns(fans, concealedCounts, openMelds, decomposition, winningTile, scenario);
+  checkSpecialPatterns(fans, concealedCounts, openMelds, decomposition, winningTile, scenario, rulesConfig);
 
   // 基本台型
-  checkBasicPatterns(fans, decomposition, openMelds, scenario);
+  checkBasicPatterns(fans, decomposition, openMelds, scenario, rulesConfig);
 
   // 獨聽判定
-  addDuTingIfApplicable(fans, concealedCounts, openMelds);
+  if (rulesConfig.duTing) {
+    addDuTingIfApplicable(fans, concealedCounts, openMelds);
+  }
 
   // 花牌
-  checkFlowers(fans, scenario);
+  checkFlowers(fans, scenario, rulesConfig);
 
   // 場況台
-  checkSituationalFans(fans, scenario, openMelds);
+  checkSituationalFans(fans, scenario, rulesConfig);
 
   // 3. 計算總台數
   const totalFan = fans.reduce((sum, f) => sum + f.fan, 0);
@@ -84,7 +88,8 @@ function checkSpecialPatterns(
   openMelds: Meld[],
   decomposition: WinningDecomposition,
   winningTile: Tile,
-  scenario: Scenario
+  scenario: Scenario,
+  rulesConfig: RulesConfig
 ): void {
   // 收集所有牌（暗牌 + 副露 + 胡張）
   const allTiles = [
@@ -96,13 +101,12 @@ function checkSpecialPatterns(
   // === 十六台 ===
 
   // 天胡：莊家取完牌後已胡牌，不得加計門清、不求、自摸、天地聽
-  if (scenario.isTianHu) {
+  if (rulesConfig.tianHu && scenario.isTianHu) {
     fans.push({ name: '天胡', fan: 16 });
-    // 天胡不加計門清、不求、自摸，但其餘可另計
   }
 
   // 地胡：閒家第一巡第一次摸牌即自摸，不得加計自摸、門清、不求、天地聽
-  if (scenario.isDiHu) {
+  if (rulesConfig.diHu && scenario.isDiHu) {
     fans.push({ name: '地胡', fan: 16 });
   }
 
@@ -110,15 +114,14 @@ function checkSpecialPatterns(
   const windKe = decomposition.melds.filter(m =>
     (m.type === 'KE' || m.type === 'GANG') && isWind(m.tiles[0])
   );
-  if (windKe.length === 4) {
+  if (rulesConfig.daSiXi && windKe.length === 4) {
     fans.push({ name: '大四喜', fan: 16 });
-    // 大四喜不加計門風、圈風
   }
 
   // === 八台 ===
 
-  // 國士無雙（13么九）- 此規則中沒有，但保留
-  if (openMelds.length === 0 && isThirteenOrphans(concealedCounts.map((c, i) => i === winningTile ? c + 1 : c))) {
+  // 國士無雙（13么九）
+  if (rulesConfig.guoShiWuShuang && openMelds.length === 0 && isThirteenOrphans(concealedCounts.map((c, i) => i === winningTile ? c + 1 : c))) {
     fans.push({ name: '國士無雙', fan: 8 });
     return; // 國士無雙排除其他判定
   }
@@ -127,31 +130,33 @@ function checkSpecialPatterns(
   const dragonKe = decomposition.melds.filter(m =>
     (m.type === 'KE' || m.type === 'GANG') && isDragon(m.tiles[0])
   );
-  if (dragonKe.length === 3) {
+  if (rulesConfig.daSanYuan && dragonKe.length === 3) {
     fans.push({ name: '大三元', fan: 8 });
   }
 
   // 小四喜（3風刻+1風將）
-  if (windKe.length === 3 && isWind(decomposition.pair[0])) {
+  if (rulesConfig.xiaoSiXi && windKe.length === 3 && isWind(decomposition.pair[0])) {
     fans.push({ name: '小四喜', fan: 8 });
   }
 
   // 字一色（全部字牌）- 圈風、門風、三元牌可複合計算
-  if (allTiles.every(t => isHonor(t))) {
+  if (rulesConfig.ziYiSe && allTiles.every(t => isHonor(t))) {
     fans.push({ name: '字一色', fan: 8 });
   }
 
   // 清一色（全部同花色數牌）
-  const suit = getSuit(allTiles.find(t => !isHonor(t)) || -1);
-  if (suit >= 0 && suit < 3 && allTiles.every(t => getSuit(t) === suit)) {
-    fans.push({ name: '清一色', fan: 8 });
+  if (rulesConfig.qingYiSe) {
+    const suit = getSuit(allTiles.find(t => !isHonor(t)) || -1);
+    if (suit >= 0 && suit < 3 && allTiles.every(t => getSuit(t) === suit)) {
+      fans.push({ name: '清一色', fan: 8 });
+    }
   }
 
   // 計算暗刻數（放槍時，胡張組成的刻子不算暗刻）
   const concealedKe = countActualConcealedTriplets(decomposition, winningTile, scenario.isSelfDraw);
 
   // 五暗刻
-  if (concealedKe === 5) {
+  if (rulesConfig.wuAnKe && concealedKe === 5) {
     fans.push({ name: '五暗刻', fan: 8 });
   }
 
@@ -160,14 +165,14 @@ function checkSpecialPatterns(
   // === 五台 ===
 
   // 四暗刻
-  if (concealedKe === 4 && !fans.some(f => f.name === '五暗刻')) {
+  if (rulesConfig.siAnKe && concealedKe === 4 && !fans.some(f => f.name === '五暗刻')) {
     fans.push({ name: '四暗刻', fan: 5 });
   }
 
   // === 四台 ===
 
   // 混一色（只有一種數牌花色+字牌）
-  if (fans.every(f => f.name !== '清一色' && f.name !== '字一色')) {
+  if (rulesConfig.hunYiSe && fans.every(f => f.name !== '清一色' && f.name !== '字一色')) {
     const suits = new Set(allTiles.filter(t => !isHonor(t)).map(t => getSuit(t)));
     if (suits.size === 1 && allTiles.some(t => isHonor(t))) {
       fans.push({ name: '混一色', fan: 4 });
@@ -175,17 +180,17 @@ function checkSpecialPatterns(
   }
 
   // 碰碰胡（全刻子）
-  if (decomposition.melds.every(m => m.type === 'KE' || m.type === 'GANG')) {
+  if (rulesConfig.pengPengHu && decomposition.melds.every(m => m.type === 'KE' || m.type === 'GANG')) {
     fans.push({ name: '碰碰胡', fan: 4 });
   }
 
   // 小三元（中發白其中二組刻子一組對子）
-  if (dragonKe.length === 2 && isDragon(decomposition.pair[0])) {
+  if (rulesConfig.xiaoSanYuan && dragonKe.length === 2 && isDragon(decomposition.pair[0])) {
     fans.push({ name: '小三元', fan: 4 });
   }
 
-  // 七對子（此規則中沒有明確列出，暫時保留）
-  if (openMelds.length === 0 && getTotalCount(concealedCounts) + 1 === 14) {
+  // 七對子
+  if (rulesConfig.qiDuiZi && openMelds.length === 0 && getTotalCount(concealedCounts) + 1 === 14) {
     const counts = [...concealedCounts];
     counts[winningTile]++;
     let pairs = 0;
@@ -204,7 +209,7 @@ function checkSpecialPatterns(
   // === 二台 ===
 
   // 平胡：五組順子+一對子，胡他人牌非自摸，無字花牌，兩面聽
-  if (isMenQing(openMelds) &&
+  if (rulesConfig.pingHu && isMenQing(openMelds) &&
     decomposition.melds.every(m => m.type === 'SHUN') &&
     !isHonor(decomposition.pair[0]) &&
     !scenario.isSelfDraw &&  // 必須胡他人牌
@@ -213,7 +218,7 @@ function checkSpecialPatterns(
   }
 
   // 全求人（4副露+單吊，胡他人牌）
-  if (openMelds.length === 4 && openMelds.every(m => m.kind !== 'AN_KONG') && !scenario.isSelfDraw) {
+  if (rulesConfig.quanQiuRen && openMelds.length === 4 && openMelds.every(m => m.kind !== 'AN_KONG') && !scenario.isSelfDraw) {
     const concealedTilesCount = getTotalCount(concealedCounts);
     if (concealedTilesCount === 1) {
       fans.push({ name: '全求人', fan: 2 });
@@ -221,7 +226,7 @@ function checkSpecialPatterns(
   }
 
   // 三暗刻
-  if (concealedKe === 3 && !fans.some(f => f.name === '四暗刻' || f.name === '五暗刻')) {
+  if (rulesConfig.sanAnKe && concealedKe === 3 && !fans.some(f => f.name === '四暗刻' || f.name === '五暗刻')) {
     fans.push({ name: '三暗刻', fan: 2 });
   }
 }
@@ -234,7 +239,8 @@ function checkBasicPatterns(
   fans: FanResult[],
   decomposition: WinningDecomposition,
   openMelds: Meld[],
-  scenario: Scenario
+  scenario: Scenario,
+  rulesConfig: RulesConfig
 ): void {
   const hasTianHu = fans.some(f => f.name === '天胡');
   const hasDiHu = fans.some(f => f.name === '地胡');
@@ -242,89 +248,102 @@ function checkBasicPatterns(
 
   // 門清：沒有吃牌、碰牌、明槓（1台）
   // 天胡、地胡不得加計門清
-  if (isMenQing(openMelds) && !hasTianHu && !hasDiHu) {
+  if (rulesConfig.menQing && isMenQing(openMelds) && !hasTianHu && !hasDiHu) {
     fans.push({ name: '門清', fan: 1 });
   }
 
   // 不求：完全沒吃碰且自摸（1台）
   // 天胡、地胡不得加計不求
-  if (isMenQing(openMelds) && scenario.isSelfDraw && !hasTianHu && !hasDiHu) {
+  if (rulesConfig.buQiu && isMenQing(openMelds) && scenario.isSelfDraw && !hasTianHu && !hasDiHu) {
     fans.push({ name: '不求', fan: 1 });
   }
 
   // 三元牌刻子（中、發、白各1台）
-  const dragonKe = decomposition.melds.filter(m =>
-    (m.type === 'KE' || m.type === 'GANG') && isDragon(m.tiles[0])
-  );
-  // 大三元時仍可計算個別三元牌台數
-  dragonKe.forEach(m => {
-    const dragonNames = ['中', '發', '白'];
-    const dragonName = dragonNames[m.tiles[0] - 31];
-    fans.push({ name: dragonName, fan: 1 });
-  });
+  if (rulesConfig.sanYuanPai) {
+    const dragonKe = decomposition.melds.filter(m =>
+      (m.type === 'KE' || m.type === 'GANG') && isDragon(m.tiles[0])
+    );
+    dragonKe.forEach(m => {
+      const dragonNames = ['中', '發', '白'];
+      const dragonName = dragonNames[m.tiles[0] - 31];
+      fans.push({ name: dragonName, fan: 1 });
+    });
+  }
 
-  // 風牌刻子（圈風、門風各1台）
-  // 大四喜不得加計門風、圈風
+  // 風牌刻子
   if (!hasDaSiXi) {
     const windKe = decomposition.melds.filter(m =>
       (m.type === 'KE' || m.type === 'GANG') && isWind(m.tiles[0])
     );
-    windKe.forEach(m => {
-      const tile = m.tiles[0];
-      if (tile === scenario.roundWind) {
-        fans.push({ name: '圈風', fan: 1 });
-      }
-      if (tile === scenario.seatWind) {
-        fans.push({ name: '門風', fan: 1 });
-      }
-    });
-  }
 
-  // 獨聽：邊張、中洞、單吊（1台）
-  // 需要在聽牌計算中判定
+    if (rulesConfig.jianHuaJianZi) {
+      // 見花見字模式：每個風牌刻子 = 1 台
+      windKe.forEach(() => {
+        fans.push({ name: '風牌刻', fan: 1 });
+      });
+    } else {
+      // 標準模式：只有匹配圈風/門風才算台
+      windKe.forEach(m => {
+        const tile = m.tiles[0];
+        if (rulesConfig.quanFeng && tile === scenario.roundWind) {
+          fans.push({ name: '圈風', fan: 1 });
+        }
+        if (rulesConfig.menFeng && tile === scenario.seatWind) {
+          fans.push({ name: '門風', fan: 1 });
+        }
+      });
+    }
+  }
 }
 
 /**
  * 檢查花牌
  * 依據中華民國麻將競技協會規則
  */
-function checkFlowers(fans: FanResult[], scenario: Scenario): void {
+function checkFlowers(fans: FanResult[], scenario: Scenario, rulesConfig: RulesConfig): void {
   // 八仙過海：8張花牌（8台）
-  if (scenario.flowers.length === 8) {
+  if (rulesConfig.baXianGuoHai && scenario.flowers.length === 8) {
     fans.push({ name: '八仙過海', fan: 8 });
     return;
   }
 
-  // 花牌編號：0春 1夏 2秋 3冬 4梅 5蘭 6菊 7竹
-  // 位置對應：0東 1南 2西 3北
-  const seatIndex = scenario.seatWind - Wind.EAST;
-  let flowerFan = 0;
+  // 花槓（梅蘭竹菊或春夏秋冬任一組完整）（2台）
+  if (rulesConfig.huaGang) {
+    const hasChunXiaQiuDong = [0, 1, 2, 3].every(f => scenario.flowers.includes(f));
+    const hasMeiLanZhuJu = [4, 5, 6, 7].every(f => scenario.flowers.includes(f));
 
-  // 檢查花槓（梅蘭竹菊或春夏秋冬任一組完整）（2台）
-  const hasChunXiaQiuDong = [0, 1, 2, 3].every(f => scenario.flowers.includes(f));
-  const hasMeiLanZhuJu = [4, 5, 6, 7].every(f => scenario.flowers.includes(f));
-
-  if (hasChunXiaQiuDong) {
-    fans.push({ name: '花槓（春夏秋冬）', fan: 2 });
-  }
-  if (hasMeiLanZhuJu) {
-    fans.push({ name: '花槓（梅蘭竹菊）', fan: 2 });
+    if (hasChunXiaQiuDong) {
+      fans.push({ name: '花槓（春夏秋冬）', fan: 2 });
+    }
+    if (hasMeiLanZhuJu) {
+      fans.push({ name: '花槓（梅蘭竹菊）', fan: 2 });
+    }
   }
 
-  // 本花：符合自己方位的花牌，一張一台
-  scenario.flowers.forEach(flower => {
-    // 春夏秋冬（0-3）對應東南西北
-    if (flower < 4 && flower === seatIndex) {
-      flowerFan++;
-    }
-    // 梅蘭菊竹（4-7）對應東南西北
-    else if (flower >= 4 && (flower - 4) === seatIndex) {
-      flowerFan++;
-    }
-  });
+  // 花牌台數
+  if (rulesConfig.huaPai) {
+    if (rulesConfig.jianHuaJianZi) {
+      // 見花見字模式：每朵花 = 1 台
+      if (scenario.flowers.length > 0) {
+        fans.push({ name: '花牌', fan: scenario.flowers.length });
+      }
+    } else {
+      // 標準模式：只有正花（對應座位）才算台
+      const seatIndex = scenario.seatWind - Wind.EAST;
+      let flowerFan = 0;
 
-  if (flowerFan > 0) {
-    fans.push({ name: '花牌', fan: flowerFan });
+      scenario.flowers.forEach(flower => {
+        if (flower < 4 && flower === seatIndex) {
+          flowerFan++;
+        } else if (flower >= 4 && (flower - 4) === seatIndex) {
+          flowerFan++;
+        }
+      });
+
+      if (flowerFan > 0) {
+        fans.push({ name: '花牌', fan: flowerFan });
+      }
+    }
   }
 }
 
@@ -335,41 +354,44 @@ function checkFlowers(fans: FanResult[], scenario: Scenario): void {
 function checkSituationalFans(
   fans: FanResult[],
   scenario: Scenario,
-  _openMelds: Meld[]
+  rulesConfig: RulesConfig
 ): void {
   const hasTianHu = fans.some(f => f.name === '天胡');
   const hasDiHu = fans.some(f => f.name === '地胡');
 
   // 自摸（1台）- 天胡、地胡不得加計自摸
-  if (scenario.isSelfDraw && !hasTianHu && !hasDiHu) {
+  if (rulesConfig.ziMo && scenario.isSelfDraw && !hasTianHu && !hasDiHu) {
     fans.push({ name: '自摸', fan: 1 });
   }
 
-  // 莊家（1台）- 做莊家者，無論胡牌或放槍都多算一台
-  if (scenario.isDealer) {
+  // 莊家（1台）
+  if (rulesConfig.zhuangJia && scenario.isDealer) {
     fans.push({ name: '莊家', fan: 1 });
   }
 
   // 連莊/拉莊：連N莊 = 連莊N台 + 拉莊N台 = 2N台
   if (scenario.isDealer && scenario.dealerStreak > 0) {
-    fans.push({ name: '連莊', fan: scenario.dealerStreak });
-    fans.push({ name: '拉莊', fan: scenario.dealerStreak });
+    if (rulesConfig.lianZhuang) {
+      fans.push({ name: '連莊', fan: scenario.dealerStreak });
+    }
+    if (rulesConfig.laZhuang) {
+      fans.push({ name: '拉莊', fan: scenario.dealerStreak });
+    }
   }
 
-  // 海底撈月：摸牌牆最後一張牌自摸（1台）
-  // 河底撈魚：胡別人丟出的最後一張牌（1台）
-  if (scenario.isHaidi) {
+  // 海底撈月/河底撈魚（1台）
+  if (rulesConfig.haiDi && scenario.isHaidi) {
     const name = scenario.isSelfDraw ? '海底撈月' : '河底撈魚';
     fans.push({ name, fan: 1 });
   }
 
   // 槓上開花（1台）
-  if (scenario.isGangShangKaiHua) {
+  if (rulesConfig.gangShangKaiHua && scenario.isGangShangKaiHua) {
     fans.push({ name: '槓上開花', fan: 1 });
   }
 
   // 搶槓（1台）
-  if (scenario.isQiangGangHu) {
+  if (rulesConfig.qiangGang && scenario.isQiangGangHu) {
     fans.push({ name: '搶槓', fan: 1 });
   }
 }
@@ -429,7 +451,6 @@ function countActualConcealedTriplets(
       // 如果是放槍，且這個刻子包含胡張，則不算暗刻（只扣一次）
       if (!isSelfDraw && !winningTileKeCounted && meld.tiles[0] === winningTile) {
         winningTileKeCounted = true;
-        // 這個刻子不算暗刻
       } else {
         count++;
       }

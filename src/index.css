@@ -63,6 +63,12 @@ input {
   font-family: inherit;
 }
 
+@media (max-width: 768px) {
+  #root {
+    padding: 0.5rem;
+  }
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

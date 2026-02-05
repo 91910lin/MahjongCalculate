@@ -1,0 +1,141 @@
+.rules-config-panel {
+  margin-bottom: 1rem;
+}
+
+.rules-toggle-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba(100, 108, 255, 0.1);
+  border: 1px solid rgba(100, 108, 255, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: inherit;
+  transition: all 0.2s;
+  width: 100%;
+  justify-content: center;
+}
+
+.rules-toggle-button:hover {
+  background-color: rgba(100, 108, 255, 0.2);
+}
+
+.rules-toggle-button .arrow {
+  font-size: 0.8rem;
+  transition: transform 0.2s;
+}
+
+.rules-toggle-button .arrow.open {
+  transform: rotate(90deg);
+}
+
+.rules-panel-content {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background-color: rgba(100, 108, 255, 0.03);
+  border: 1px solid rgba(100, 108, 255, 0.15);
+  border-radius: 8px;
+}
+
+.rules-special-mode {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: rgba(255, 152, 0, 0.08);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  border-radius: 6px;
+}
+
+.rules-special-mode label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.rules-special-mode .mode-description {
+  margin-top: 0.4rem;
+  margin-left: 1.5rem;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.rules-group {
+  margin-bottom: 0.75rem;
+}
+
+.rules-group-title {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #646cff;
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid rgba(100, 108, 255, 0.2);
+}
+
+.rules-group-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.rule-item input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.rule-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rule-item.disabled input[type="checkbox"] {
+  cursor: not-allowed;
+}
+
+.rules-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(100, 108, 255, 0.1);
+}
+
+.reset-button {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  background-color: transparent;
+  border: 1px solid #888;
+  border-radius: 4px;
+  cursor: pointer;
+  color: inherit;
+}
+
+.reset-button:hover {
+  background-color: rgba(100, 108, 255, 0.1);
+  border-color: #646cff;
+}
+
+@media (max-width: 768px) {
+  .rules-panel-content {
+    padding: 0.75rem;
+  }
+
+  .rules-group-items {
+    gap: 0.2rem 0.75rem;
+  }
+
+  .rule-item {
+    font-size: 0.8rem;
+  }
+}

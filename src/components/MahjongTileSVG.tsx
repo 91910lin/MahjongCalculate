@@ -21,10 +21,11 @@ export function MahjongTileSVG({ tile, width = 60, height = 80 }: MahjongTileSVG
         height={height}
         style={{
           filter: 'drop-shadow(2px 2px 3px rgba(0,0,0,0.3))',
-          cursor: 'default'
+          cursor: 'default',
+          maxWidth: '100%',
+          height: 'auto'
         }}
       />
-      <span style={{ fontSize: '10px', color: '#888', marginTop: '2px' }}>{tile}</span>
     </div>
   )
 }
